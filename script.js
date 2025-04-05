@@ -11,6 +11,7 @@ const handleOnSubmit = (e) => {
     task: task,
     hr: number,
     id: randomIdGenerator(),
+    type: 'entry',
   };
 
   taskList.push(obj);
@@ -19,11 +20,13 @@ displayEntryList();
 
 // here we have created a fubnction displayEntryList to add value and 
 const displayEntryList = () => {
-  console.log(taskList);
+    console.log(taskList);
  let str = " ";
 
   const entryElm = document.getElementById("entryList");
-  taskList.map((item, i)=>{
+
+  const entryList =taskList.filter((item) =>item.type === 'entry');
+  entryList.map((item, i) => {
    str += `
      <tr>
          <td>${ i + 1}</td>
@@ -31,15 +34,42 @@ const displayEntryList = () => {
                 <td>${item.hr}</td>
               <td class = "text-end">
                     <div onclick="handleOnDelete('${item.id}')" class="btn btn-danger"><i class="fa-solid fa-trash"></i></div>
-                    <div class="btn btn-success"><i class="fa-solid fa-arrow-right"></i></div>
+                    <div onclick="switchTask('${item.id}', 'bad')" class="btn btn-success"><i class="fa-solid fa-arrow-right"></i></div>
 
               </td>
    </tr>
     `;
-  });
-  entryElm.innerHTML = str
+});
+  entryElm.innerHTML = str;
 };
 
+// here we have created a function for badList
+const displayBadList = () => {
+    console.log(taskList);
+ let str = " ";
+
+  const badElm = document.getElementById("badList");
+
+  const badList =taskList.filter((item) =>item.type === 'bad');
+  badList.map((item, i) => {
+   str += `
+     <tr>
+         <td>${ i + 1}</td>
+            <td>${item.task}</td>
+                <td>${item.hr}</td>
+              <td class = "text-end">
+                
+                    <div onclick="switchTask('${item.id}', 'entry')" class="btn btn-warning"><i class="fa-solid fa-arrow-left"></i></div>
+                    <div onclick="handleOnDelete('${item.id}')" class="btn btn-danger"><i class="fa-solid fa-trash"></i></div>
+
+              </td>
+   </tr>
+    `;
+});
+  badElm.innerHTML = str;
+};
+
+//here we have created a function to gice task a randomId
 const randomIdGenerator = (length = 6) => {
 const str = "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM1234567890" 
 
@@ -54,8 +84,24 @@ for (let i=0;i< 6; i++){
 }
 return id;
 }
-
+//here we have created a function and passed ID as a parameter to delete the task with the help of id
 const handleOnDelete = (id) => {
-    console.log(id);
+    if (window.confirm("Are you sure you want to delete this?")) {
+    taskList = taskList.filter((item)=> item.id !== id);
+    displayEntryList();
+    displayBadList();
 }
+};
 
+const switchTask = (id, type) => {
+taskList = taskList.map((item) => {
+    //
+    // console.log(item);
+    if(item.id === id ) {
+        item.type = type
+    } 
+    return item;
+})
+displayEntryList();
+displayBadList();
+};
