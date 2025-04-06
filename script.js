@@ -1,10 +1,15 @@
 let taskList = []; // we declared an array here to store the value, we will create objects inside the array
 
+// const ttlHrs = document.getElementById("ttlHrs");
+// const savedHrs = document.getElementById("savedHrs");
+
+const hrsPerWeek = 24 * 7;
+
 const handleOnSubmit = (e) => {
   const newForm = new FormData(e);
 
   const task = newForm.get("task");
-  const number = newForm.get("number");
+  const number = +newForm.get("number");
   //  console.log(task, number);
   const obj = {
     //we created an obj and intitalised the value, so that we can push the obj inside the taskList. using the push method.
@@ -13,6 +18,13 @@ const handleOnSubmit = (e) => {
     id: randomIdGenerator(),
     type: 'entry',
   };
+
+  // check if there is hours left 
+  const existingTtlHrs = taskTotal()
+
+  if(existingTtlHrs + number > hrsPerWeek) {
+    return alert("Invalid hrs");
+  }
 
   taskList.push(obj);
 displayEntryList();
@@ -41,11 +53,12 @@ const displayEntryList = () => {
     `;
 });
   entryElm.innerHTML = str;
+  taskTotal();
 };
 
 // here we have created a function for badList
 const displayBadList = () => {
-    console.log(taskList);
+    // console.log(taskList);
  let str = " ";
 
   const badElm = document.getElementById("badList");
@@ -67,6 +80,7 @@ const displayBadList = () => {
     `;
 });
   badElm.innerHTML = str;
+  document.getElementById("savedHrs").innerText = badList.reduce((acc, item) => acc + item.hr, 0)
 };
 
 //here we have created a function to gice task a randomId
@@ -93,6 +107,7 @@ const handleOnDelete = (id) => {
 }
 };
 
+// here we have created a function to switch the task from one side to another.
 const switchTask = (id, type) => {
 taskList = taskList.map((item) => {
     //
@@ -104,4 +119,14 @@ taskList = taskList.map((item) => {
 })
 displayEntryList();
 displayBadList();
+};
+
+// here we will add all the hours to show the total allocated hours
+const taskTotal = () => {
+  const ttlHrs = taskList.reduce((acc, item)=>{
+
+    return acc + item.hr
+  }, 0);
+  document.getElementById("ttlHrs").innerText = ttlHrs;
+  return ttlHrs;
 };
